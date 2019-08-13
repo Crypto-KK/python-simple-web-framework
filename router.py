@@ -48,7 +48,15 @@ class Application:
         start_response(response.status, response.headers.items())
         return iter(response)
 
-app = Application(routers)
+class UpperMideleware:
+    def __init__(self, app):
+        self.app = app
+
+    def __call__(self, environ, start_response):
+        for data in self.app(environ, start_response):
+            yield data.upper()
+
+app = UpperMideleware(Application(routers))
 
 if __name__ == '__main__':
     from wsgiref.simple_server import make_server
